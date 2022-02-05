@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Bottodir</title>
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Bitter:400,700">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700">
+    <link rel="stylesheet" href="/assets/fonts/fontawesome-all.min.css">
+    <link rel="stylesheet" href="/assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="/assets/fonts/fontawesome5-overrides.min.css">
+    <link rel="stylesheet" href="/assets/css/Header-Blue.css">
+    <link rel="stylesheet" href="/assets/css/Header-Dark.css">
+    <link rel="stylesheet" href="/assets/css/Navigation-Clean.css">
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link rel="stylesheet" href="/assets/css/Team-Clean.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-light navbar-expand-md navigation-clean">
+        <div class="container"><a class="navbar-brand" href="/">Bottodir</a><button data-bs-toggle="collapse"
+                class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle
+                    navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navcol-1">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/manage">Manage Commands</a></li>
+                    <li class="nav-item dropdown"><a class="dropdown-toggle nav-link" aria-expanded="false"
+                            data-bs-toggle="dropdown" href="#">Random facts about...</a>
+                        <div class="dropdown-menu"><a class="dropdown-item" href="/facts/cats">Cats</a></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <script>
+        async function delete_command(commandId) {
+            const token = "<%= token %>"
+            const req = await fetch('<%= "https://discordapp.com/api/v9/applications/" + id %>' + `/commands/${commandId}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bot ${token}`,
+                    "Content-Type": "application/json",
+                },
+            })
+            if (req.status !== 204) {
+                alert(`Failed to delete command: ${req.status}`)
+                return;
+            }
+            window.location.reload()
+        }
+        async function othertoken() {
+            await fetch("/deletecookie")
+            window.location.href = "/manage"
+        }
+    </script>
+    <div style="margin: 2%;" role="alert" class="alert alert-success"><span>Please note that global slash command can
+            take up to an hour to
+            update.</span></div>
+    <div style="margin: 1%;"><a class="btn btn-secondary" onclick="othertoken()">Use another bot token</a></div>
+    <div style="margin: 2%;">
+        <% for (let i=0;i<commands.length;i++) { const com = commands[i]; %>
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title"><%= com.name %></h4>
+                <p class="card-text"><%= com.description %> </p>
+                <div><a class="btn btn-primary" data-bs-toggle="collapse" aria-expanded="false"
+                        aria-controls=<%= `collapse-${i}` %> href=<%= `#collapse-${i}` %> role="button">View
+                        subcommands/args</a>
+                    <div class="collapse" id=<%= `collapse-${i}` %>>
+                        <p><%= com.options?JSON.stringify(com.options):"no options/subcommands" %></p>
+                    </div>
+                </div><button class="btn btn-primary btn-danger" data-bs-toggle="modal"
+                    data-bs-target=<%= `#modal${i}` %> type="button">Delete command</button>
+                <div class="modal fade" aria-labelledby="exampleModalLabel" aria-hidden="true" tabindex="-1"
+                    id=<%= `modal${i}` %>>
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Warning!</h4><button type="button" class="btn-close"
+                                    data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to delete the <%= com.name %> command?</p>
+                            </div>
+                            <div class="modal-footer"><button class="btn btn-light" type="button"
+                                    data-bs-dismiss="modal">No</button><button class="btn btn-primary btn-danger"
+                                    type="button" onclick=<%= `delete_command("${com.id}")` %>>Yes</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
+    </div>
+    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+</body>
+
+</html>
